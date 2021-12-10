@@ -1,6 +1,6 @@
-use std::str::FromStr;
+use std::{ops::RangeInclusive, str::FromStr, collections::HashSet};
 
-#[derive(Copy, Clone, Debug, Default)]
+#[derive(Hash, Eq, PartialEq, Copy, Clone, Debug, Default)]
 struct Coord {
     x: u16,
     y: u16,
@@ -24,19 +24,20 @@ impl Line {
         on_x && on_y
     }
 
-    fn points(&self) -> Box<dyn Iterator<Item=Coord>> {
+    fn points(&self) -> Box<dyn Iterator<Item = Coord>> {
         if self.0.x == self.1.x {
             let x = self.0.x;
-            Box::new((self.0.y..=self.1.y).map(move |v| Coord{x, y: v}))
+            Box::new((self.0.y..=self.1.y).map(move |v| Coord { x, y: v }))
         } else if self.0.y == self.1.y {
             let y = self.0.y;
-            Box::new((self.0.x..=self.1.x).map(move |v| Coord{x: v, y}))
+            Box::new((self.0.x..=self.1.x).map(move |v| Coord { x: v, y }))
         } else {
-            Box::new((self.0.x..=self.1.x).map(|v| Coord{x: v, y: v}))        
+            Box::new((self.0.x..=self.1.x).map(move |v| Coord { x: v, y: v }))
         }
     }
 
-    fn intersect(&self, other: &Line) -> impl Iterator<Item=Coord> {
+    fn intersect(&self, other: &Line) -> impl Iterator<Item = Coord> {
+        self.points().collect::<HashSet<Coord>>();
         std::iter::once(Coord::default())
     }
 }
